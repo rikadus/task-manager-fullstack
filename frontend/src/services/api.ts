@@ -2,7 +2,7 @@ import axios from "axios";
 import { Task } from "../types/Task";
 
 const api = axios.create({
-  baseURL: "https://task-manager-api-nkke.onrender.com",
+  baseURL: "https://task-manager-api-365t.onrender.com",
 });
 
 export const taskService = {
