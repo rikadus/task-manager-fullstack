@@ -1,8 +1,17 @@
 import axios from "axios";
 import { Task } from "../types/Task";
 
+// Configuração Inteligente:
+// Se estiver no "localhost", usa o seu PC.
+// Se estiver na internet, usa o seu NOVO link do Render.
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
 const api = axios.create({
-  baseURL: "https://task-manager-api-365t.onrender.com",
+  baseURL: isLocalhost
+    ? "http://localhost:3333" // Garanta que seu backend local esteja rodando aqui
+    : "https://task-manager-api-365t.onrender.com", //
 });
 
 export const taskService = {
