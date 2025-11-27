@@ -88,7 +88,7 @@ export function TaskManager() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 px-4 bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center py-8 px-4 bg-blue-100">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6">
         <h1 className="text-4xl font-bold text-center text-indigo-900 mb-8">
           📋 Gerenciador de Tarefas
@@ -97,7 +97,7 @@ export function TaskManager() {
         {/* Formulário */}
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 relative"
+          className="bg-green-300 border border-gray-200 rounded-lg p-6 mb-8 relative"
         >
           {/* Indicador visual de Edição */}
           {editingId && (
