@@ -1,99 +1,93 @@
-import express, { Express, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+// Carrega variáveis de ambiente
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+const app = express();
 
-// Middlewares
+// 1. CONFIGURAÇÃO DO CORS (Permite que o Front fale com o Back)
 app.use(cors());
+
+// 2. CONFIGURAÇÃO DO JSON (Permite ler os dados enviados)
 app.use(express.json());
 
-// Interface da Tarefa
+// Banco de dados em memória (Array simples)
 interface Task {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   completed: boolean;
-  createdAt: Date;
 }
 
-// Banco de dados em memória (temporário)
 let tasks: Task[] = [];
 
-// Rotas
+// --- ROTAS ---
 
-// GET - Listar todas as tarefas
-app.get("/api/tasks", (req: Request, res: Response) => {
+// Rota de Teste (para ver se o servidor está vivo)
+app.get("/", (req, res) => {
+  res.send("API do Task Manager está rodando! 🚀");
+});
+
+// Listar Tarefas
+app.get("/tasks", (req, res) => {
   res.json(tasks);
 });
 
-// GET - Buscar tarefa por ID
-app.get("/api/tasks/:id", (req: Request, res: Response) => {
-  const task = tasks.find((t) => t.id === req.params.id);
-  if (!task) {
-    return res.status(404).json({ message: "Tarefa não encontrada" });
-  }
-  res.json(task);
-});
-
-// POST - Criar nova tarefa
-app.post("/api/tasks", (req: Request, res: Response) => {
+// Criar Tarefa
+app.post("/tasks", (req, res) => {
   const { title, description } = req.body;
 
-  if (!title) {
-    return res.status(400).json({ message: "Título é obrigatório" });
-  }
-
   const newTask: Task = {
-    id: Date.now().toString(),
+    id: new Date().toISOString(), // Gera ID único baseado no tempo
     title,
-    description: description || "",
+    description,
     completed: false,
-    createdAt: new Date(),
   };
 
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
 
-// PUT - Atualizar tarefa
-app.put("/api/tasks/:id", (req: Request, res: Response) => {
+// Atualizar Tarefa (Editar ou Concluir)
+app.put("/tasks/:id", (req, res) => {
+  const { id } = req.params;
   const { title, description, completed } = req.body;
-  const taskIndex = tasks.findIndex((t) => t.id === req.params.id);
 
-  if (taskIndex === -1) {
-    return res.status(404).json({ message: "Tarefa não encontrada" });
+  const taskIndex = tasks.findIndex((t) => t.id === id);
+
+  if (taskIndex < 0) {
+    return res.status(404).json({ error: "Tarefa não encontrada" });
   }
 
+  // Atualiza apenas os campos enviados
+  const task = tasks[taskIndex];
   tasks[taskIndex] = {
-    ...tasks[taskIndex],
-    title: title ?? tasks[taskIndex].title,
-    description: description ?? tasks[taskIndex].description,
-    completed: completed ?? tasks[taskIndex].completed,
+    ...task,
+    title: title ?? task.title,
+    description: description ?? task.description,
+    completed: completed ?? task.completed,
   };
 
   res.json(tasks[taskIndex]);
 });
 
-// DELETE - Excluir tarefa
-app.delete("/api/tasks/:id", (req: Request, res: Response) => {
-  const taskIndex = tasks.findIndex((t) => t.id === req.params.id);
+// Deletar Tarefa
+app.delete("/tasks/:id", (req, res) => {
+  const { id } = req.params;
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
-  if (taskIndex === -1) {
-    return res.status(404).json({ message: "Tarefa não encontrada" });
+  if (taskIndex < 0) {
+    return res.status(404).json({ error: "Tarefa não encontrada" });
   }
 
   tasks.splice(taskIndex, 1);
   res.status(204).send();
 });
 
-// Rota raiz
-app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "API Task Manager - Backend funcionando!" });
-});
+// --- INICIALIZAÇÃO ---
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando na porta ${port}`);

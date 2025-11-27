@@ -10,7 +10,7 @@ const isLocalhost =
 
 const api = axios.create({
   baseURL: isLocalhost
-    ? "http://localhost:3333" // Garanta que seu backend local esteja rodando aqui
+    ? "http://localhost:3000" // Garanta que seu backend local esteja rodando aqui
     : "https://task-manager-api-365t.onrender.com", //
 });
 
